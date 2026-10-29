@@ -1,0 +1,92 @@
+<main class="dashboard">
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Accueil">
+      <span class="brand-mark" aria-hidden="true">T</span>
+      <span>THERMAL<span class="brand-light">/MONITOR</span></span>
+    </a>
+    <span class="system-label"><span class="system-dot"></span>SYSTÈME LOCAL</span>
+  </header>
+
+  <section class="content" aria-labelledby="dashboard-title">
+    <div class="page-heading">
+      <div>
+        <p class="eyebrow">SUPERVISION / CAPTEURS</p>
+        <h1 id="dashboard-title">Supervision thermique</h1>
+        <p class="subtitle">Suivi en temps réel de la sonde distante</p>
+      </div>
+      <div class="connection" [class.connected]="status === 'Connecté'">
+        <span class="connection-dot"></span>
+        {{ status }}
+      </div>
+    </div>
+
+    <div class="sensor-card">
+      <div class="card-heading">
+        <div>
+          <p class="eyebrow">CANAL DE MESURE 01</p>
+          <h2>Sonde thermique</h2>
+        </div>
+        <span class="sensor-icon" aria-hidden="true">°</span>
+      </div>
+
+      <div class="reading" aria-live="polite">
+        @if (sensorData$ | async; as temp) {
+          <span class="temperature">{{ temp | number: '1.1-1' }}</span>
+          <span class="unit">°C</span>
+        } @else {
+          <span class="temperature placeholder">--.-</span>
+          <span class="unit">°C</span>
+        }
+      </div>
+
+      <p class="reading-caption">
+        @if (status === 'Connecté') {
+          Réception des relevés en cours
+        } @else if (status === 'Erreur') {
+          La sonde a interrompu la transmission
+        } @else if (status === 'Terminé') {
+          Cycle de mesure terminé
+        } @else if (status === 'Arrêté') {
+          Écoute interrompue manuellement
+        } @else {
+          Aucune mesure reçue
+        }
+      </p>
+
+      @if (errorMessage) {
+        <p class="error-message" role="alert">{{ errorMessage }}</p>
+      }
+
+      <div class="actions">
+        <button class="start-button" (click)="startSensor()" [disabled]="status === 'Connecté'">
+          <span aria-hidden="true">▶</span>
+          Démarrer
+        </button>
+        <button class="stop-button" (click)="stopSensor()" [disabled]="status !== 'Connecté'">
+          <span aria-hidden="true">■</span>
+          Arrêter l'urgence
+        </button>
+      </div>
+    </div>
+
+    <div class="info-grid">
+      <article class="info-card">
+        <span class="info-label">FRÉQUENCE</span>
+        <strong>1 <span>seconde</span></strong>
+        <p>Intervalle entre chaque relevé</p>
+      </article>
+      <article class="info-card">
+        <span class="info-label">DURÉE DU CYCLE</span>
+        <strong>5 <span>relevés</span></strong>
+        <p>Arrêt automatique en fin de cycle</p>
+      </article>
+      <article class="info-card">
+        <span class="info-label">SEUIL CRITIQUE</span>
+        <strong>50 <span>°C</span></strong>
+        <p>Arrêt immédiat en cas de surchauffe</p>
+      </article>
+    </div>
+
+    <footer>Flux simulé · Les relevés supérieurs à 50 °C déclenchent une alerte</footer>
+  </section>
+</main>
